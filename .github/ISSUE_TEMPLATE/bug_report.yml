@@ -1,0 +1,63 @@
+name: Bug report
+description: Report a reproducible problem in Review AI Dashboard
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve Review AI Dashboard.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem
+      description: Describe what went wrong and what you expected instead.
+      placeholder: A clear and concise description of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the smallest set of steps that consistently reproduces the problem.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Public feedback form
+        - Admin dashboard
+        - Backend API
+        - Background worker
+        - Docker deployment
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the browser, operating system, or deployment environment when relevant.
+      placeholder: Chrome 131 on macOS, local Docker Compose
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Add useful output after removing secrets and personal data.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed secrets and personal data from logs and screenshots.
+          required: true

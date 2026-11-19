@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest a focused improvement to Review AI Dashboard
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: Describe the user need first, then the proposed solution.
+  - type: textarea
+    id: problem
+    attributes:
+      label: User need
+      description: Explain the problem or limitation this proposal addresses.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the smallest useful change that would address the need.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Mention existing workarounds or other approaches you considered.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Product area
+      options:
+        - Public feedback form
+        - Admin dashboard
+        - AI review analysis
+        - Backend API
+        - Deployment and operations
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I searched existing issues for a similar request.
+          required: true
+        - label: This request describes one focused improvement.
+          required: true
