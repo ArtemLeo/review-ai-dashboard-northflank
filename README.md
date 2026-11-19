@@ -11,6 +11,9 @@
 ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
+[![CI](https://github.com/ArtemLeo/review-ai-dashboard-northflank/actions/workflows/ci.yml/badge.svg)](https://github.com/ArtemLeo/review-ai-dashboard-northflank/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/ArtemLeo/review-ai-dashboard-northflank/actions/workflows/codeql.yml/badge.svg)](https://github.com/ArtemLeo/review-ai-dashboard-northflank/actions/workflows/codeql.yml)
+
 **One review form for players. One dashboard for the support team.**
 
 [Features](#features) · [How it works](#how-it-works) · [Quick start](#quick-start) · [Quality checks](#quality-checks)
