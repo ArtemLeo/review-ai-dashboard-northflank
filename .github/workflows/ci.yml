@@ -57,4 +57,29 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - run: docker build -t review-ai-dashboard:ci .
+      - name: Start the application stack
+        run: docker compose up --build --detach --wait --wait-timeout 120
+      - name: Check the public endpoints and admin session
+        run: |
+          curl --fail --silent --show-error http://localhost:8080/health \
+            | grep --fixed-strings '"status":"healthy"'
+          curl --fail --silent --show-error --output /dev/null http://localhost:8080/
+
+          cookie_jar="$(mktemp)"
+          trap 'rm -f "$cookie_jar"' EXIT
+          curl --fail --silent --show-error \
+            --cookie-jar "$cookie_jar" \
+            --header 'Content-Type: application/json' \
+            --data '{"email":"admin-artem-leo","password":"password-artem-leo"}' \
+            http://localhost:8080/api/auth/login \
+            | grep --fixed-strings '"email":"admin-artem-leo"'
+          curl --fail --silent --show-error \
+            --cookie "$cookie_jar" \
+            http://localhost:8080/api/auth/me \
+            | grep --fixed-strings '"email":"admin-artem-leo"'
+      - name: Show container logs after a failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop the application stack
+        if: always()
+        run: docker compose down --volumes --remove-orphans
