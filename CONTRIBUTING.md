@@ -15,6 +15,8 @@ tested, and easy to review.
 
 2. Make one logical change. Do not commit secrets, `.env` files,
    `node_modules`, build artifacts, or local database files.
+   Shared `.editorconfig` and `.gitattributes` rules keep formatting and line
+   endings consistent across operating systems and editors.
 3. Run the relevant checks below.
 4. Commit with a concise message such as `fix: handle an expired session` or
    `docs: clarify the Docker setup`.
