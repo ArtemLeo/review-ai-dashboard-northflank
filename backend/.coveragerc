@@ -1,0 +1,5 @@
+# pytest.ini selects what is measured and prints the report to the terminal.
+# The scratch data file lives in .pytest_cache/ (git-ignored), so no coverage
+# files appear in the project.
+[run]
+data_file = .pytest_cache/.coverage

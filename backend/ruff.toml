@@ -1,0 +1,36 @@
+# Ruff: PEP 8 (pycodestyle), pyflakes, import order, docstrings (Google
+# style) and the bugbear / pyupgrade / bandit / simplify rule families.
+line-length = 120
+target-version = "py311"
+extend-exclude = ["alembic/versions"]
+
+[lint]
+select = [
+    "E", "W",  # pycodestyle (PEP 8)
+    "F",       # pyflakes
+    "I",       # import order
+    "N",       # PEP 8 naming
+    "D",       # docstrings (PEP 257)
+    "UP",      # modern syntax for the target Python
+    "B",       # likely bugs
+    "S",       # security (bandit)
+    "SIM",     # simplifications
+    "C4",      # comprehensions
+    "PIE",     # unnecessary code
+    "RET",     # return statements
+    "PT",      # pytest style
+    "RUF",     # ruff-specific checks
+]
+ignore = [
+    "B008",    # FastAPI declares dependencies as Depends(...) defaults
+    "UP042",   # str-mixin enums: StrEnum would change str() of the members
+    "RUF001",  # non-Latin text in reviews and prompts is intended
+]
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.per-file-ignores]
+"scripts/*" = ["E402", "S311"]           # sys.path setup before imports; demo data randomness
+"scripts/seed_database.py" = ["E501"]    # long demo review texts
+"tests/*" = ["S101", "S105", "S106", "S603", "D"]  # asserts, fake credentials, test docstrings optional
