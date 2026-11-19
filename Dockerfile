@@ -1,7 +1,7 @@
 # Single-container image: nginx serves the built dashboard on $PORT and
 # proxies the API to uvicorn inside the container.
 
-FROM node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 AS frontend
+FROM node:26-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS frontend
 
 WORKDIR /build
 COPY frontend/package*.json ./
@@ -10,7 +10,7 @@ COPY frontend/ ./
 RUN npm run build
 
 
-FROM python:3.11-slim@sha256:b7a9e5f6a93d6d4a31f129bbd4bdee69efccb6ded0fb230d78aafaf37af98377
+FROM python:3.15-slim@sha256:65a65fc7b30b06cb6df4930fd4650697cb23f4c2698ab81fc87e4b031bc36928
 
 # PGCONNECT_TIMEOUT makes the database driver give up on a server that does
 # not answer, so a hung database fails the start-up instead of blocking it.
