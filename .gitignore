@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Celery beat schedule, written next to a worker started without --schedule
+celerybeat-schedule*
+
+# Application logs (auto-generated at runtime, not part of source code)
+logs/
+*.log
+
+# Node.js / Vue client
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# Databases, local secrets and configurations
+.env
+*.db
+*.sqlite3
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+*.sw?
+
+# Claude Code personal settings.
+.claude/
+
+# MCP client config may hold the Northflank API token
+.mcp.json
