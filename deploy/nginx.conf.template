@@ -1,0 +1,128 @@
+# nginx of the single-container deployment.  start.sh fills in ${PORT};
+# the other $variables are nginx's own and are left untouched.
+# nginx runs as an unprivileged user, so every writable path is in /tmp.
+
+worker_processes 1;
+pid /tmp/nginx.pid;
+error_log /dev/stderr warn;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # The forwarded chain is logged, so the platform's Logs tab shows which
+    # address the per-IP rate limits see: the last entry of the chain.
+    log_format main '$remote_addr forwarded_for="$http_x_forwarded_for" '
+                    '"$request" $status $body_bytes_sent "$http_user_agent"';
+    access_log /dev/stdout main;
+    client_body_temp_path /tmp/nginx-client-body;
+    proxy_temp_path /tmp/nginx-proxy;
+    fastcgi_temp_path /tmp/nginx-fastcgi;
+    uwsgi_temp_path /tmp/nginx-uwsgi;
+    scgi_temp_path /tmp/nginx-scgi;
+
+    server_tokens off;
+
+    # The platform's load balancer appends the visitor's address to
+    # X-Forwarded-For, and the backend trusts only the last entry, so the
+    # header is passed on unchanged; appending would make the balancer the
+    # "client" and give every visitor the same rate-limit budget.
+    map $http_x_forwarded_for $client_forwarded_for {
+        ""      $remote_addr;
+        default $http_x_forwarded_for;
+    }
+
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_min_length 1024;
+    gzip_types
+        text/plain
+        text/css
+        text/javascript
+        application/javascript
+        application/json
+        application/xml
+        image/svg+xml
+        text/csv;
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+
+    server {
+        listen 0.0.0.0:${PORT};
+        server_name _;
+
+        root /usr/share/nginx/html;
+        index index.html;
+
+        client_max_body_size 1m;
+
+        include /etc/nginx/nginx-headers.conf;
+
+        # The file names carry a content hash, so a year-long cache is safe;
+        # one Cache-Control header says it all ("expires" would add another).
+        location /assets/ {
+            add_header Cache-Control "public, max-age=31536000, immutable";
+            include /etc/nginx/nginx-headers.conf;
+            access_log off;
+        }
+
+        location = /index.html {
+            add_header Cache-Control "no-cache, must-revalidate";
+            include /etc/nginx/nginx-headers.conf;
+        }
+
+        # Not hashed, so the browser revalidates it after every deploy.
+        location = /theme-init.js {
+            add_header Cache-Control "no-cache";
+            include /etc/nginx/nginx-headers.conf;
+        }
+
+        location = /favicon.png {
+            expires 7d;
+            include /etc/nginx/nginx-headers.conf;
+            access_log off;
+        }
+
+        location / {
+            try_files $uri $uri/ /index.html;
+            include /etc/nginx/nginx-headers.conf;
+        }
+
+        location /api/ {
+            proxy_pass http://127.0.0.1:8000/api/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $client_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            include /etc/nginx/nginx-headers.conf;
+        }
+
+        location /health {
+            proxy_pass http://127.0.0.1:8000/health;
+            access_log off;
+        }
+
+        location /docs {
+            proxy_pass http://127.0.0.1:8000/docs;
+            proxy_set_header Host $host;
+            include /etc/nginx/nginx-base-headers.conf;
+            add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" always;
+        }
+
+        location /openapi.json {
+            proxy_pass http://127.0.0.1:8000/openapi.json;
+            proxy_set_header Host $host;
+            include /etc/nginx/nginx-headers.conf;
+        }
+    }
+}

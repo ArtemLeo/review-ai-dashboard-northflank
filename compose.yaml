@@ -1,0 +1,68 @@
+name: review-ai-dashboard
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: reviews_db
+      POSTGRES_USER: reviews
+      POSTGRES_PASSWORD: reviews_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reviews -d reviews_db"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    image: review-ai-dashboard:local
+    environment:
+      PORT: "8080"
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+psycopg://reviews:reviews_password@postgres:5432/reviews_db
+      REDIS_URL: redis://redis:6379/0
+      AI_PROVIDER: stub
+      SEED_DEMO_DATA: "true"
+      ADMIN_EMAIL: admin-artem-leo
+      ADMIN_PASSWORD: password-artem-leo
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    image: review-ai-dashboard:local
+    pull_policy: never
+    command:
+      - celery
+      - -A
+      - app.core.celery_app.celery_app
+      - worker
+      - --loglevel=info
+      - --concurrency=2
+      - --queues=reviews
+      - --beat
+      - --schedule=/tmp/celerybeat-schedule
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+psycopg://reviews:reviews_password@postgres:5432/reviews_db
+      REDIS_URL: redis://redis:6379/0
+      AI_PROVIDER: stub
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
